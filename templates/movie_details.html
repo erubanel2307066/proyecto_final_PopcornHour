@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2 class="text-2xl font-bold">{{ pelicula.titulo }}</h2>
+  <p>{{ pelicula.descripcion }}</p>
+
+  <h3 class="mt-4 text-xl">Comentarios</h3>
+  <ul class="list-disc ml-5">
+    {% for comentario in comentarios %}
+      <li>{{ comentario.texto }} - por Usuario {{ comentario.user_id }}</li>
+    {% endfor %}
+  </ul>
+
+  <form action="{{ url_for('comentar', pelicula_id=pelicula.id) }}" method="POST" class="mt-4">
+    <textarea name="comentario" rows="3" class="w-full p-2 border"></textarea>
+    <input type="hidden" name="user_id" value="1"> <!-- Aquí pondrías el ID del usuario autenticado -->
+    <button type="submit" class="mt-2 bg-blue-500 text-white px-4 py-2">Comentar</button>
+  </form>
+{% endblock %}
