@@ -4,8 +4,8 @@ import supabase
 app = Flask(__name__)
 
 # Configuración de Supabase
-supabase_url = "TU_SUPABASE_URL"
-supabase_key = "TU_SUPABASE_KEY"
+supabase_url = "https://druqkagvgwrsordpmgnb.supabase.co"
+supabase_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRydXFrYWd2Z3dyc29yZHBtZ25iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk2NDIzOTgsImV4cCI6MjA0NTIxODM5OH0.RVH4k-D5C2iIdcfxISQZq6lnGRDBBeoAQDvhFoWjuvc"
 client = supabase.create_client(supabase_url, supabase_key)
 
 # Ruta para la página de inicio
