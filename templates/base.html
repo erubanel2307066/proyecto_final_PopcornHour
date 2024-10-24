@@ -3,14 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PelisPlus</title>
-  <link href="/static/css/output.css" rel="stylesheet">
+  <title>PopcornHour</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 text-gray-900">
   <nav class="bg-blue-600 p-4 text-white">
     <h1 class="text-3xl">PopcornHour</h1>
   </nav>
   <div class="container mx-auto py-8">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+          {% for category, message in messages %}
+            <li class="bg-{{ 'red' if category == 'danger' else 'green' }}-500 text-white p-2 mb-4">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
     {% block content %}{% endblock %}
   </div>
 </body>
