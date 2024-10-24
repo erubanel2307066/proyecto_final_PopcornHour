@@ -1,18 +1,30 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <div class="container mx-auto mt-10">
-    <h2 class="text-3xl font-bold mb-4">Iniciar Sesión</h2>
-    <form action="{{ url_for('login') }}" method="POST" class="w-full max-w-md">
-      <div class="mb-4">
-        <label class="block text-gray-700">Correo Electrónico</label>
-        <input type="email" name="email" class="border border-gray-300 p-2 w-full">
+  <div class="bg-cover bg-center min-h-screen" style="background-image: url('/static/img/fondo.jpg');">
+    <div class="container mx-auto mt-10 flex justify-center items-center min-h-screen">
+      <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <div class="text-center mb-6">
+          <img src="/static/img/logo.png" alt="Logo" class="mx-auto h-20">
+        </div>
+        <h2 class="text-3xl font-bold mb-4 text-center">Iniciar Sesión</h2>
+        <form action="{{ url_for('login') }}" method="POST" class="w-full">
+          <div class="mb-4">
+            <label class="block text-gray-700">Correo Electrónico</label>
+            <input type="email" name="email" class="border border-gray-300 p-2 w-full" required>
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700">Contraseña</label>
+            <input type="password" name="password" class="border border-gray-300 p-2 w-full" required>
+          </div>
+          <button type="submit" class="bg-blue-500 text-white px-4 py-2 w-full">Iniciar Sesión</button>
+        </form>
+
+        <div class="mt-4">
+          <p class="text-center text-gray-700">¿No tienes una cuenta?</p>
+          <a href="{{ url_for('register') }}" class="bg-green-500 text-white px-4 py-2 w-full block text-center mt-2">Registrarme</a>
+        </div>
       </div>
-      <div class="mb-4">
-        <label class="block text-gray-700">Contraseña</label>
-        <input type="password" name="password" class="border border-gray-300 p-2 w-full">
-      </div>
-      <button type="submit" class="bg-blue-500 text-white px-4 py-2">Iniciar Sesión</button>
-    </form>
+    </div>
   </div>
 {% endblock %}
