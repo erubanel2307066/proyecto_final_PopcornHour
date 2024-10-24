@@ -13,7 +13,7 @@
 
   <form action="{{ url_for('comentar', pelicula_id=pelicula.id) }}" method="POST" class="mt-4">
     <textarea name="comentario" rows="3" class="w-full p-2 border"></textarea>
-    <input type="hidden" name="user_id" value="1"> <!-- Aquí pondrías el ID del usuario autenticado -->
+    <input type="hidden" name="user_id" value="1"> <!-- ID del usuario autenticado -->
     <button type="submit" class="mt-2 bg-blue-500 text-white px-4 py-2">Comentar</button>
   </form>
 {% endblock %}

@@ -11,13 +11,13 @@ client = supabase.create_client(supabase_url, supabase_key)
 # Ruta para la página de inicio
 @app.route('/')
 def home():
-    peliculas = client.table('Peliculas').select('*').execute().data
+    peliculas = client.table('peliculas').select('*').execute().data
     return render_template('home.html', peliculas=peliculas)
 
 # Ruta para ver los detalles de una película
 @app.route('/pelicula/<int:pelicula_id>')
 def movie_details(pelicula_id):
-    pelicula = client.table('Peliculas').select('*').eq('id', pelicula_id).execute().data[0]
+    pelicula = client.table('peliculas').select('*').eq('id', pelicula_id).execute().data[0]
     comentarios = client.table('Comentarios').select('*').eq('pelicula_id', pelicula_id).execute().data
     return render_template('movie_details.html', pelicula=pelicula, comentarios=comentarios)
 
