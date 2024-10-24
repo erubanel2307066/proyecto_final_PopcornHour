@@ -1,18 +1,29 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <div class="container mx-auto mt-10">
-    <h2 class="text-3xl font-bold mb-4">Registro</h2>
-    <form action="{{ url_for('register') }}" method="POST" class="w-full max-w-md">
-      <div class="mb-4">
-        <label class="block text-gray-700">Correo Electrónico</label>
-        <input type="email" name="email" class="border border-gray-300 p-2 w-full">
+  <div class="relative bg-cover bg-center min-h-screen" style="background-image: url('/static/img/fondo_registro.jpg');">
+    <!-- Overlay para desvanecer el fondo -->
+    <div class="absolute inset-0 bg-black opacity-50"></div>
+    
+    <!-- Contenedor centrado -->
+    <div class="relative flex justify-center items-center min-h-screen">
+      <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <div class="text-center mb-6">
+          <img src="/static/img/logo.png" alt="Logo" class="mx-auto h-20">
+        </div>
+        <h2 class="text-3xl font-bold mb-4 text-center">Registro</h2>
+        <form action="{{ url_for('register') }}" method="POST" class="w-full">
+          <div class="mb-4">
+            <label class="block text-gray-700">Correo Electrónico</label>
+            <input type="email" name="email" class="border border-gray-300 p-2 w-full" required>
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700">Contraseña</label>
+            <input type="password" name="password" class="border border-gray-300 p-2 w-full" required>
+          </div>
+          <button type="submit" class="bg-blue-500 text-white px-4 py-2 w-full">Registrarse</button>
+        </form>
       </div>
-      <div class="mb-4">
-        <label class="block text-gray-700">Contraseña</label>
-        <input type="password" name="password" class="border border-gray-300 p-2 w-full">
-      </div>
-      <button type="submit" class="bg-blue-500 text-white px-4 py-2">Registrarse</button>
-    </form>
+    </div>
   </div>
 {% endblock %}

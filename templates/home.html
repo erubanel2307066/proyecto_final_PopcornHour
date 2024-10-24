@@ -1,14 +1,21 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2 class="text-2xl mb-4">Películas Disponibles</h2>
-  <div class="grid grid-cols-3 gap-4">
-    {% for pelicula in peliculas %}
-      <div class="bg-white shadow-md p-4 rounded-lg">
-        <h3 class="text-xl font-bold">{{ pelicula.titulo }}</h3>
-        <p>{{ pelicula.descripcion }}</p>
-        <a href="{{ url_for('movie_details', pelicula_id=pelicula.id) }}" class="text-blue-600">Ver más</a>
-      </div>
-    {% endfor %}
+  <div class="container mx-auto mt-10">
+    <h2 class="text-3xl font-bold mb-4">Películas Recientes</h2>
+    
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('subir_pelicula') }}" class="bg-blue-500 text-white px-4 py-2 mb-4 inline-block">Subir Nueva Película</a>
+    {% endif %}
+    
+    <div class="grid grid-cols-3 gap-4">
+      {% for pelicula in peliculas %}
+        <div class="bg-white shadow-md p-4 rounded-lg">
+          <h3 class="text-xl font-bold">{{ pelicula.titulo }}</h3>
+          <p>{{ pelicula.descripcion }}</p>
+          <a href="{{ url_for('ver_pelicula', pelicula_id=pelicula.id) }}" class="text-blue-600">Ver más</a>
+        </div>
+      {% endfor %}
+    </div>
   </div>
 {% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mx-auto mt-10">
+    <h2 class="text-3xl font-bold mb-4">{{ pelicula.titulo }}</h2>
+    <p>{{ pelicula.descripcion }}</p>
+    
+    <h3 class="text-2xl font-bold mt-6">Comentarios</h3>
+    
+    {% for comentario in comentarios %}
+      <div class="mb-4 p-4 border border-gray-300 rounded-lg">
+        <p>{{ comentario.comentario }}</p>
+        <p class="text-sm text-gray-500">Comentario de: {{ comentario.usuario_email }} el {{ comentario.fecha }}</p>
+      </div>
+    {% endfor %}
+    
+    {% if current_user.is_authenticated %}
+      <form action="{{ url_for('comentar', pelicula_id=pelicula.id) }}" method="POST" class="mt-4">
+        <textarea name="comentario" class="border border-gray-300 p-2 w-full" placeholder="Escribe tu comentario..." required></textarea>
+        <button type="submit" class="bg-green-500 text-white px-4 py-2 mt-2">Comentar</button>
+      </form>
+    {% else %}
+      <p class="mt-4 text-red-500">Inicia sesión para dejar un comentario.</p>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% if current_user.id == pelicula.moderador_id %}
+  <form action="{{ url_for('eliminar_pelicula', pelicula_id=pelicula.id) }}" method="POST" class="mt-4">
+    <button type="submit" class="bg-red-500 text-white px-4 py-2">Eliminar Película</button>
+  </form>
+{% endif %}
