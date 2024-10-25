@@ -21,7 +21,8 @@ login_manager.login_view = 'login'
 # Cargar usuario
 @login_manager.user_loader
 def load_user(user_id):
-    result = client.table('Usuarios').select('*').eq('id', user_id).execute()
+    # Asegúrate de que el nombre de la tabla coincide exactamente con el de tu base de datos
+    result = client.table('usuarios').select('*').eq('id', user_id).execute()
     user_data = result.data[0] if result.data else None
     if user_data:
         return User(user_data['id'], user_data['email'], user_data['password_hash'])
@@ -36,13 +37,13 @@ def register():
         password_hash = User.hash_password(password)
 
         # Verificar si el correo ya existe
-        existing_user = client.table('Usuarios').select('*').eq('email', email).execute().data
+        existing_user = client.table('usuarios').select('*').eq('email', email).execute().data
         if existing_user:
             flash("El correo ya está registrado.", "danger")
             return redirect(url_for('register'))
 
         # Crear nuevo usuario
-        client.table('Usuarios').insert({'email': email, 'password_hash': password_hash}).execute()
+        client.table('usuarios').insert({'email': email, 'password_hash': password_hash}).execute()
         flash("Registro exitoso. Por favor, inicia sesión.", "success")
         return redirect(url_for('login'))
     return render_template('register.html')
@@ -55,7 +56,7 @@ def login():
         password = request.form['password']
 
         # Buscar el usuario por correo electrónico
-        result = client.table('Usuarios').select('*').eq('email', email).execute()
+        result = client.table('usuarios').select('*').eq('email', email).execute()
         user_data = result.data
         if user_data:
             user = User(user_data[0]['id'], user_data[0]['email'], user_data[0]['password_hash'])
@@ -69,6 +70,13 @@ def login():
             flash("El usuario no existe.", "danger")
     return render_template('login.html')
 
+# Ruta para la página principal (protegida)
+@app.route('/')
+@login_required
+def home():
+    peliculas = client.table('peliculas').select('*').execute().data
+    return render_template('home.html', peliculas=peliculas)
+
 # Ruta para subir película
 @app.route('/subir_pelicula', methods=['GET', 'POST'])
 @login_required
@@ -78,7 +86,7 @@ def subir_pelicula():
         descripcion = request.form['descripcion']
         
         # Inserta la película en la base de datos
-        result = client.table('Peliculas').insert({
+        result = client.table('peliculas').insert({
             'titulo': titulo,
             'descripcion': descripcion,
             'moderador_id': current_user.id  # El usuario actual que está subiendo la película
@@ -93,30 +101,61 @@ def subir_pelicula():
     
     return render_template('subir_pelicula.html')
 
-# Ruta para la página principal (protegida)
-@app.route('/')
-@login_required
-def home():
-    peliculas = client.table('Peliculas').select('*').execute().data
-    return render_template('home.html', peliculas=peliculas)
-
 # Ruta para ver los detalles de una película
 @app.route('/pelicula/<int:pelicula_id>', methods=['GET'])
 def ver_pelicula(pelicula_id):
     # Obtener la película
-    pelicula = client.table('Peliculas').select('*').eq('id', pelicula_id).execute().data[0]
+    pelicula = client.table('peliculas').select('*').eq('id', pelicula_id).execute().data[0]
+
+    # Obtener la calificación promedio
+    calificaciones = client.table('calificaciones').select('calificacion').eq('pelicula_id', pelicula_id).execute().data
+    if calificaciones:
+        calificacion_promedio = sum([c['calificacion'] for c in calificaciones]) / len(calificaciones)
+        calificacion_promedio = round(calificacion_promedio, 2)  # Redondear a 2 decimales
+    else:
+        calificacion_promedio = "Sin calificaciones"
 
     # Obtener los comentarios con la información del usuario
-    comentarios_query = """
-    SELECT Comentarios.comentario, Comentarios.fecha, Usuarios.email as usuario_email
-    FROM Comentarios
-    JOIN Usuarios ON Comentarios.usuario_id = Usuarios.id
-    WHERE Comentarios.pelicula_id = %s
-    """
-    comentarios = client.rpc('run_sql', {'sql': comentarios_query % pelicula_id}).execute().data
+    comentarios = client.rpc('obtener_comentarios_con_usuario', {'pelicula_id': pelicula_id}).execute().data
 
-    return render_template('ver_pelicula.html', pelicula=pelicula, comentarios=comentarios)
+    return render_template('ver_pelicula.html', pelicula=pelicula, comentarios=comentarios, calificacion_promedio=calificacion_promedio)
 
+# Ruta para calificar película
+@app.route('/pelicula/<int:pelicula_id>/calificar', methods=['POST'])
+@login_required
+def calificar_pelicula(pelicula_id):
+    calificacion = int(request.form['calificacion'])
+
+    # Verificar si el usuario ya calificó esta película
+    calificacion_existente = client.table('calificaciones').select('*').eq('pelicula_id', pelicula_id).eq('usuario_id', current_user.id).execute().data
+    
+    if calificacion_existente:
+        # Actualizar la calificación existente
+        client.table('calificaciones').update({'calificacion': calificacion}).eq('id', calificacion_existente[0]['id']).execute()
+    else:
+        # Insertar nueva calificación
+        client.table('calificaciones').insert({
+            'calificacion': calificacion,
+            'pelicula_id': pelicula_id,
+            'usuario_id': current_user.id
+        }).execute()
+
+    flash("Calificación registrada correctamente.", "success")
+    return redirect(url_for('ver_pelicula', pelicula_id=pelicula_id))
+
+# Ruta para eliminar película
+@app.route('/pelicula/<int:pelicula_id>/eliminar', methods=['POST'])
+@login_required
+def eliminar_pelicula(pelicula_id):
+    # Solo el moderador puede eliminar la película
+    pelicula = client.table('peliculas').select('*').eq('id', pelicula_id).execute().data[0]
+    if pelicula['moderador_id'] != current_user.id:
+        flash("No tienes permiso para eliminar esta película.", "danger")
+        return redirect(url_for('home'))
+
+    client.table('peliculas').delete().eq('id', pelicula_id).execute()
+    flash("Película eliminada exitosamente.", "success")
+    return redirect(url_for('home'))
 
 # Ruta para comentar en una película
 @app.route('/pelicula/<int:pelicula_id>/comentar', methods=['POST'])
@@ -124,28 +163,30 @@ def ver_pelicula(pelicula_id):
 def comentar(pelicula_id):
     comentario = request.form['comentario']
     
-    client.table('Comentarios').insert({
+    # Insertar el comentario en la base de datos
+    client.table('comentarios').insert({
         'comentario': comentario,
         'pelicula_id': pelicula_id,
-        'usuario_id': current_user.id
+        'usuario_id': current_user.id,
+        'fecha': 'now()'
     }).execute()
     
     return redirect(url_for('ver_pelicula', pelicula_id=pelicula_id))
 
+# Ruta para eliminar comentario
 @app.route('/comentario/<int:comentario_id>/eliminar', methods=['POST'])
 @login_required
 def eliminar_comentario(comentario_id):
-    comentario = client.table('Comentarios').select('*').eq('id', comentario_id).execute().data[0]
+    comentario = client.table('comentarios').select('*').eq('id', comentario_id).execute().data[0]
 
     # Solo el usuario que hizo el comentario puede eliminarlo
     if comentario['usuario_id'] != current_user.id:
         flash("No tienes permiso para eliminar este comentario.", "danger")
         return redirect(url_for('home'))
 
-    client.table('Comentarios').delete().eq('id', comentario_id).execute()
+    client.table('comentarios').delete().eq('id', comentario_id).execute()
     flash("Comentario eliminado exitosamente.", "success")
     return redirect(url_for('ver_pelicula', pelicula_id=comentario['pelicula_id']))
-
 
 # Ruta para cerrar sesión
 @app.route('/logout')

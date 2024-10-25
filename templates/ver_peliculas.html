@@ -5,15 +5,41 @@
     <h2 class="text-3xl font-bold mb-4">{{ pelicula.titulo }}</h2>
     <p>{{ pelicula.descripcion }}</p>
     
+    <!-- Mostrar calificación promedio -->
+    <p class="text-lg font-semibold mt-4">Calificación promedio: {{ calificacion_promedio }} / 5</p>
+
+    <!-- Formulario de calificación -->
+    {% if current_user.is_authenticated %}
+      <form action="{{ url_for('calificar_pelicula', pelicula_id=pelicula.id) }}" method="POST" class="mt-4">
+        <label for="calificacion" class="block text-gray-700">Tu Calificación</label>
+        <select name="calificacion" id="calificacion" class="border border-gray-300 p-2">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 ml-2">Calificar</button>
+      </form>
+    {% else %}
+      <p class="mt-4 text-red-500">Inicia sesión para calificar esta película.</p>
+    {% endif %}
+
+    <!-- Resto del contenido: comentarios -->
     <h3 class="text-2xl font-bold mt-6">Comentarios</h3>
-    
     {% for comentario in comentarios %}
       <div class="mb-4 p-4 border border-gray-300 rounded-lg">
         <p>{{ comentario.comentario }}</p>
         <p class="text-sm text-gray-500">Comentario de: {{ comentario.usuario_email }} el {{ comentario.fecha }}</p>
+        {% if current_user.is_authenticated and current_user.id == comentario.usuario_id %}
+          <form action="{{ url_for('eliminar_comentario', comentario_id=comentario.id) }}" method="POST">
+            <button type="submit" class="bg-red-500 text-white px-4 py-2 mt-2">Eliminar Comentario</button>
+          </form>
+        {% endif %}
       </div>
     {% endfor %}
     
+    <!-- Formulario para añadir un comentario -->
     {% if current_user.is_authenticated %}
       <form action="{{ url_for('comentar', pelicula_id=pelicula.id) }}" method="POST" class="mt-4">
         <textarea name="comentario" class="border border-gray-300 p-2 w-full" placeholder="Escribe tu comentario..." required></textarea>
@@ -25,8 +51,4 @@
   </div>
 {% endblock %}
 
-{% if current_user.id == pelicula.moderador_id %}
-  <form action="{{ url_for('eliminar_pelicula', pelicula_id=pelicula.id) }}" method="POST" class="mt-4">
-    <button type="submit" class="bg-red-500 text-white px-4 py-2">Eliminar Película</button>
-  </form>
-{% endif %}
+
