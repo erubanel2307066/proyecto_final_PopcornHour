@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mx-auto mt-10">
+    <h2 class="text-3xl font-bold mb-4">Perfil de {{ usuario.email }}</h2>
+    
+    <h3 class="text-2xl font-bold mt-6">Películas Subidas</h3>
+    {% if peliculas_subidas %}
+      <ul>
+        {% for pelicula in peliculas_subidas %}
+          <li class="mb-4 p-4 border border-gray-300 rounded-lg">
+            <h4 class="text-xl font-semibold">{{ pelicula.titulo }}</h4>
+            <p>{{ pelicula.descripcion }}</p>
+            <a href="{{ url_for('ver_pelicula', pelicula_id=pelicula.id) }}" class="text-blue-500">Ver más</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No has subido ninguna película.</p>
+    {% endif %}
+
+    <h3 class="text-2xl font-bold mt-6">Comentarios Realizados</h3>
+    {% if comentarios %}
+      <ul>
+        {% for comentario in comentarios %}
+          <li class="mb-4 p-4 border border-gray-300 rounded-lg">
+            <p>{{ comentario.comentario }}</p>
+            <p class="text-sm text-gray-500">En la película: <a href="{{ url_for('ver_pelicula', pelicula_id=comentario.pelicula_id) }}" class="text-blue-500">{{ comentario.pelicula_id }}</a></p>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No has realizado ningún comentario.</p>
+    {% endif %}
+  </div>
+{% endblock %}

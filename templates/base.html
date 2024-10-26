@@ -21,6 +21,14 @@
       {% endif %}
     {% endwith %}
     {% block content %}{% endblock %}
+
+
+    <form action="{{ url_for('buscar') }}" method="POST" class="flex items-center justify-center">
+      <input type="text" name="termino" placeholder="Buscar películas..." class="border border-gray-300 p-2 rounded-l-lg">
+      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-r-lg">Buscar</button>
+    </form>
+    
   </div>
 </body>
 </html>
+

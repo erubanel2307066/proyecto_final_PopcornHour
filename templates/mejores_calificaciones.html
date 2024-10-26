@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mx-auto mt-10">
+    <h2 class="text-3xl font-bold mb-4">Películas Mejor Calificadas</h2>
+    {% if peliculas %}
+      <ul>
+        {% for pelicula in peliculas %}
+          <li class="mb-4 p-4 border border-gray-300 rounded-lg">
+            <h3 class="text-xl font-semibold">{{ pelicula.titulo }}</h3>
+            <p>{{ pelicula.descripcion }}</p>
+            <p>Calificación promedio: {{ pelicula.calificacion_promedio | round(2) }}</p>
+            <a href="{{ url_for('ver_pelicula', pelicula_id=pelicula.id) }}" class="text-blue-500">Ver más</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No hay películas calificadas aún.</p>
+    {% endif %}
+  </div>
+{% endblock %}

@@ -188,6 +188,34 @@ def eliminar_comentario(comentario_id):
     flash("Comentario eliminado exitosamente.", "success")
     return redirect(url_for('ver_pelicula', pelicula_id=comentario['pelicula_id']))
 
+@app.route('/perfil')
+@login_required
+def perfil():
+    # Lógica para obtener datos del usuario
+    usuario = client.table('usuarios').select('email').eq('id', current_user.id).execute().data[0]
+    peliculas_subidas = client.table('peliculas').select('*').eq('moderador_id', current_user.id).execute().data
+    comentarios = client.table('comentarios').select('*').eq('usuario_id', current_user.id).execute().data
+
+    return render_template('perfil.html', usuario=usuario, peliculas_subidas=peliculas_subidas, comentarios=comentarios)
+
+@app.route('/buscar', methods=['GET', 'POST'])
+def buscar():
+    peliculas = []
+    if request.method == 'POST':
+        termino = request.form['termino']
+        
+        # Buscar películas por título
+        peliculas = client.table('peliculas').select('*').ilike('titulo', f'%{termino}%').execute().data
+
+    return render_template('buscar.html', peliculas=peliculas)
+
+@app.route('/mejores_calificaciones')
+def mejores_calificaciones():
+    # Obtener películas con sus calificaciones promedio ordenadas de mayor a menor
+    peliculas = client.rpc('obtener_peliculas_mejor_calificadas').execute().data
+    return render_template('mejores_calificaciones.html', peliculas=peliculas)
+
+
 # Ruta para cerrar sesión
 @app.route('/logout')
 @login_required
