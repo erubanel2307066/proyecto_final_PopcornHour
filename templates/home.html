@@ -20,6 +20,13 @@
       </nav>
     </header>
 
+    <!-- Botón para subir película solo si el usuario está autenticado -->
+    {% if current_user.is_authenticated %}
+      <div class="mb-4">
+        <a href="{{ url_for('subir_pelicula') }}" class="bg-green-500 text-white px-4 py-2 rounded-lg">Subir Película</a>
+      </div>
+    {% endif %}
+
     <!-- Contenido de las películas disponibles -->
     <h2 class="text-3xl font-bold mb-4">Películas Disponibles</h2>
     <div class="grid grid-cols-3 gap-4">
