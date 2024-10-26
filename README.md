@@ -19,7 +19,7 @@ Base de datos: Supabase
 
 Instalación
 Para instalar y ejecutar FilmeGo en tu dispositivo, sigue los siguientes pasos:
-Clona el repositorio: git clone https://github.com/[tu-usuario]/FilmeGo.git
+Clona el repositorio: git clone https://github.com/erubanel2307066/proyecto_final_PopcornHour.git
 Instala las dependencias: npm install o yarn install
 Ejecuta la aplicación: npm run android o npm run ios
 
